@@ -70,6 +70,7 @@ class User(AbstractBaseUser, CustomPermissionsMixin):
         choices=ROLE,
     )
 
+    # after group creates
     # student_group = models.ForeignKey(
     #     "Group",
     #     on_delete=models.SET_NULL,
