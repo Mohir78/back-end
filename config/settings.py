@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     # apps
     'user',
     'apps.blog',
+    'apps.faculty',
     'apps.group',
     'apps.notifications',
 ]

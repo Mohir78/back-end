@@ -1,80 +1,128 @@
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
 
+from user.custom_permission import CustomPermissionsMixin
 from user.manager import CustomUserManager
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, CustomPermissionsMixin):
     ROLE = [
         ['DEAN', 'DEAN'],
         ['STAFF', 'STAFF'],
         ['STUDENT', 'STUDENT'],
     ]
 
-    username_validator = UnicodeUsernameValidator()
+    SEX = [
+        ['MALE', 'MALE'],
+        ['FEMALE', 'FEMALE'],
+        ['OTHER', 'OTHER'],
+    ]
 
-    firstname = models.CharField(
-        max_length=100,
+    fio = models.CharField(
+        max_length=150,
         null=True
     )
-    lastname = models.CharField(
-        max_length=100,
-        null=True
+
+    sex = models.CharField(
+        max_length=10,
+        choices=SEX
     )
-    fathername = models.CharField(
-        max_length=100,
+
+    date_of_birth = models.DateField()
+
+    region_of_birth = models.CharField(
+        max_length=50,
         null=True,
         blank=True
     )
-    username = models.CharField(
-        max_length=255,
-        unique=True,
-        validators=[username_validator],
+
+    nation = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True
     )
-    email = models.EmailField(
-        blank=True,
-        null=True
+
+    type_of_school = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True
     )
-    is_active = models.BooleanField(
-        default=True
+
+    description = models.TextField(
+        null=True,
+        blank=True
     )
-    created_at = models.DateTimeField(
-        default=timezone.now
+
+    from_course_to_course = models.CharField(
+        max_length=500
+    )
+
+    profile_image = models.ImageField(
+        upload_to='profile_images/',
+        null=True,
+        blank=True
     )
 
     role = models.CharField(
         max_length=15,
         choices=ROLE,
-        null=False
+    )
+
+    # student_group = models.ForeignKey(
+    #     "Group",
+    #     on_delete=models.SET_NULL,
+    #     null=True,
+    #     blank=True
+    # )
+
+    passport_series = models.CharField(
+        max_length=10,
+        unique=True,
+        null=True,
+        blank=True
     )
 
     JSHIR = models.CharField(
         max_length=14,
         unique=True,
+        null=True,
+        blank=True
     )
 
-    passport_number = models.CharField(
-        max_length=10,
+    id_number = models.CharField(
+        "ID",
+        max_length=50,
+        unique=True,
     )
 
-    profile_image = models.ImageField(
-        upload_to='profile_image/',
+    order_number = models.BigIntegerField(
+        null=True,
+        blank=True
     )
 
-    phone_number = models.CharField(
-        max_length=12,
-        blank=True,
-        null=True
+    order_date = models.DateField(
+        null=True,
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        default=timezone.now
+    )
+    is_active = models.BooleanField(
+        default=True
+    )
+    is_staff = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True
     )
 
     objects = CustomUserManager()
 
-    EMAIL_FIELD = "email"
-    USERNAME_FIELD = "username"
+    USERNAME_FIELD = "id_number"
 
-    def email_user(self, subject, message, from_email=None, **kwargs):
-        send_mail(subject, message, from_email, [self.email], **kwargs)
+    class Meta:
+        db_table = 'user'
+        ordering = ['fio', ]
